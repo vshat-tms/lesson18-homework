@@ -46,42 +46,61 @@ class MainActivity : AppCompatActivity() {
             "⌫" -> handleEraseClick()
             in DIGITS -> handleDigitClick(text)
             in SIGNS -> handleSignClick(text)
-            "." -> handleDotClick()
+            "." -> handleDotClick(text)
             "=" -> handleEqualsClick()
-
+            "SIGN" -> handleChangeSignClick()
         }
     }
 
-    fun handleDelClick() {
+    private fun handleChangeSignClick() {
+        if (displayedText.isEmpty() || displayedText == DIGITS[0]) return
+
+        displayedText = if (displayedText.startsWith("-")) {
+            displayedText.substring(1)
+        } else {
+            displayedText.padStart(displayedText.length + 1, '-')
+        }
+    }
+
+    private fun handleDelClick() {
         firstNumber = null
         sign = null
-        displayedText = "0"
+        displayedText = DIGITS[0]
     }
 
-    fun handleEraseClick() {
+    private fun handleEraseClick() {
         displayedText = displayedText.dropLast(1)
+        if (displayedText == SIGNS[1] || displayedText.isEmpty()) {
+            displayedText = DIGITS[0]
+        }
     }
 
-    fun handleDigitClick(digitText: String) {
-        if (displayedText.startsWith("0") || displayedText in SIGNS) {
+    private fun handleDigitClick(digitText: String) {
+
+        if (displayedText == DIGITS[0] || displayedText in SIGNS || displayedText.isEmpty()) {
             displayedText = digitText
         } else {
             displayedText += digitText
         }
     }
 
-    fun handleSignClick(signText: String) {
-        if (this.firstNumber != null || this.sign != null) return
-        this.firstNumber = displayedNumber
+    private fun handleSignClick(signText: String) {
+        if (this.firstNumber == null) {
+            this.firstNumber = displayedNumber
+        }
         this.sign = signText
         displayedText = signText
     }
 
-    fun handleDotClick() {
-
+    private fun handleDotClick(digitText: String) {
+        if (displayedText in SIGNS || displayedText.isEmpty() || displayedText.contains(".")) {
+            return
+        } else {
+            displayedText += digitText
+        }
     }
 
-    fun handleEqualsClick() {
+    private fun handleEqualsClick() {
         Log.d(
             TAG, "clicked equals with " +
                     "firstNumber=${this.firstNumber}, " +
@@ -93,23 +112,25 @@ class MainActivity : AppCompatActivity() {
         val sign = this.sign ?: return
         val secondNumber = displayedNumber ?: return
 
-        val result = firstNumber + secondNumber
+        displayedNumber = when (sign) {
+            "+" -> firstNumber + secondNumber
+            "-" -> firstNumber - secondNumber
+            "÷" -> firstNumber / secondNumber
+            "×" -> firstNumber * secondNumber
+            else -> null
+        }
 
         this.firstNumber = null
         this.sign = null
-        displayedNumber = result
     }
 
     companion object {
         private const val TAG = "MainActivity"
-
-
         private val DIGITS = listOf(
             "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
         )
-
         private val SIGNS = listOf(
-            "+", "-", "*", "/"
+            "+", "-", "×", "÷"
         )
     }
 }

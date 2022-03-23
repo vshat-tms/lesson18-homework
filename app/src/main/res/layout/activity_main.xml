@@ -43,6 +43,15 @@
                 android:text="DEL"
                 android:textSize="28sp" />
 
+            <Button
+                android:layout_width="120dp"
+                android:layout_height="60dp"
+                android:layout_column="1"
+                android:layout_marginLeft="8dp"
+                android:onClick="onButtonClick"
+                android:text="SIGN"
+                android:textSize="28sp" />
+
             <Space
                 android:layout_width="0dp"
                 android:layout_height="60dp"
