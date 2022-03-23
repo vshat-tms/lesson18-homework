@@ -48,40 +48,65 @@ class MainActivity : AppCompatActivity() {
             in SIGNS -> handleSignClick(text)
             "." -> handleDotClick()
             "=" -> handleEqualsClick()
-
+            "SIGN" -> handleReversDigitSign()
         }
     }
 
-    fun handleDelClick() {
+    private fun handleReversDigitSign() {
+        Log.d(TAG, "sign $displayedText not in SIGNS ${displayedText !in SIGNS}")
+        displayedText = if (
+            displayedText !in SIGNS && displayedText.toDouble() > 0) {
+            "-$displayedText"
+        } else {
+            if (displayedText.length == 1) {
+                return
+            }
+            displayedText.removePrefix("-")
+        }
+        Log.d(TAG, "sign was reversed digit is $displayedText")
+    }
+
+    private fun handleDelClick() {
         firstNumber = null
         sign = null
         displayedText = "0"
     }
 
-    fun handleEraseClick() {
+    private fun handleEraseClick() {
         displayedText = displayedText.dropLast(1)
+        if (displayedText.isEmpty()) {
+            displayedText = "0"
+            sign = null
+            firstNumber = null
+        }
     }
 
-    fun handleDigitClick(digitText: String) {
-        if (displayedText.startsWith("0") || displayedText in SIGNS) {
+    private fun handleDigitClick(digitText: String) {
+        if ((displayedText.startsWith("0") && !displayedText.startsWith("0."))
+            || displayedText in SIGNS
+        )
+        {
             displayedText = digitText
         } else {
             displayedText += digitText
         }
+        Log.d(TAG, "text starts with 0. - ${!displayedText.startsWith("0.")}")
     }
 
-    fun handleSignClick(signText: String) {
+    private fun handleSignClick(signText: String) {
         if (this.firstNumber != null || this.sign != null) return
         this.firstNumber = displayedNumber
         this.sign = signText
         displayedText = signText
     }
 
-    fun handleDotClick() {
-
+    private fun handleDotClick() {
+        if (!displayedText.contains('.')) {
+            displayedText += "."
+        }
     }
 
-    fun handleEqualsClick() {
+    private fun handleEqualsClick() {
         Log.d(
             TAG, "clicked equals with " +
                     "firstNumber=${this.firstNumber}, " +
@@ -93,11 +118,17 @@ class MainActivity : AppCompatActivity() {
         val sign = this.sign ?: return
         val secondNumber = displayedNumber ?: return
 
-        val result = firstNumber + secondNumber
+        val result = when (sign) {
+            "+" -> firstNumber + secondNumber
+            "-" -> firstNumber - secondNumber
+            "×" -> firstNumber * secondNumber
+            "÷" -> firstNumber / secondNumber
+            else -> 0
+        }
 
         this.firstNumber = null
         this.sign = null
-        displayedNumber = result
+        displayedNumber = result.toDouble()
     }
 
     companion object {
@@ -109,7 +140,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         private val SIGNS = listOf(
-            "+", "-", "*", "/"
+            "+", "-", "×", "÷"
         )
     }
 }
