@@ -48,40 +48,72 @@ class MainActivity : AppCompatActivity() {
             in SIGNS -> handleSignClick(text)
             "." -> handleDotClick()
             "=" -> handleEqualsClick()
+            "SIGN" -> handleToReserveDigit()
+
 
         }
     }
 
-    fun handleDelClick() {
+    private fun handleToReserveDigit() {
+        displayedText =
+            if (displayedText.toDouble() > 0 && displayedText !in SIGNS) {
+                "-$displayedText"
+            } else {
+                if (displayedText.length == 1) {
+                    return
+                }
+                displayedText.removePrefix("-")
+            }
+        Log.d(TAG, "Button SIGN was reversed digit $displayedText")
+    }
+
+    private fun handleDelClick() {
         firstNumber = null
         sign = null
         displayedText = "0"
+
+        Log.d(TAG, "Button DEL delete all operations")
     }
 
-    fun handleEraseClick() {
+    private fun handleEraseClick() {
         displayedText = displayedText.dropLast(1)
+        if (displayedText.isEmpty()){
+            displayedText = "0"
+            sign = null
+            firstNumber = null
+        }
+        Log.d(TAG, "Button <x reoved the las digit of number")
     }
 
-    fun handleDigitClick(digitText: String) {
+    private fun handleDigitClick(digitText: String) {
         if (displayedText.startsWith("0") || displayedText in SIGNS) {
             displayedText = digitText
+            Log.d(TAG, "User clicked on button $displayedText")
         } else {
             displayedText += digitText
+            Log.d(TAG, "User clicked on button $digitText - new number is $displayedText")
         }
     }
 
-    fun handleSignClick(signText: String) {
+    private fun handleSignClick(signText: String) {
         if (this.firstNumber != null || this.sign != null) return
         this.firstNumber = displayedNumber
         this.sign = signText
         displayedText = signText
+
+        Log.d(TAG, "User choose operation ($displayedText) ")
     }
 
-    fun handleDotClick() {
-
+    private fun handleDotClick() {
+        if(!displayedText.contains(".")){
+            displayedText += "."
+            Log.d(TAG, "User add dot to the number")
+        }else{
+            Log.d(TAG,"User try to add second dot")
+        }
     }
 
-    fun handleEqualsClick() {
+    private fun handleEqualsClick() {
         Log.d(
             TAG, "clicked equals with " +
                     "firstNumber=${this.firstNumber}, " +
@@ -93,11 +125,19 @@ class MainActivity : AppCompatActivity() {
         val sign = this.sign ?: return
         val secondNumber = displayedNumber ?: return
 
-        val result = firstNumber + secondNumber
+        var result = when (sign){
+            "+" -> firstNumber + secondNumber
+            "-" -> firstNumber - secondNumber
+            "×" -> firstNumber * secondNumber
+            "÷" -> firstNumber / secondNumber
+            else -> 0
+        }
+
+        Log.d(TAG,"Operation = ended with result $result")
 
         this.firstNumber = null
         this.sign = null
-        displayedNumber = result
+        displayedNumber = result.toDouble()
     }
 
     companion object {
@@ -109,7 +149,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         private val SIGNS = listOf(
-            "+", "-", "*", "/"
+            "+", "-", "×", "÷"
         )
     }
 }
