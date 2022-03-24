@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import java.lang.Exception
 
 class MainActivity : AppCompatActivity() {
     private lateinit var displayTextView: TextView
@@ -48,12 +49,11 @@ class MainActivity : AppCompatActivity() {
             in SIGNS -> handleSignClick(text)
             "." -> handleDotClick()
             "=" -> handleEqualsClick()
-            "SIGN" -> handleReversDigitSign()
+            "SIGN" -> handleReversDigitSignClick()
         }
     }
 
-    private fun handleReversDigitSign() {
-        Log.d(TAG, "sign $displayedText not in SIGNS ${displayedText !in SIGNS}")
+    private fun handleReversDigitSignClick() {
         displayedText = if (
             displayedText !in SIGNS && displayedText.toDouble() > 0) {
             "-$displayedText"
@@ -84,8 +84,7 @@ class MainActivity : AppCompatActivity() {
     private fun handleDigitClick(digitText: String) {
         if ((displayedText.startsWith("0") && !displayedText.startsWith("0."))
             || displayedText in SIGNS
-        )
-        {
+        ) {
             displayedText = digitText
         } else {
             displayedText += digitText
