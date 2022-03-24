@@ -107,7 +107,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun handleDigitClick(digitText: String) {
         if ((displayedText.startsWith("0") && !displayedText.startsWith("0."))
-            || displayedText in SIGNS
+            || isSignDisplayed
         ) {
             displayedText = digitText
         } else {
