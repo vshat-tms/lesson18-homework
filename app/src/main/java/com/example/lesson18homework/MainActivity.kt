@@ -101,7 +101,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleDotClick() {
-        if (!displayedText.contains('.')) {
+        if (!displayedText.contains('.') && displayedText !in SIGNS) {
             displayedText += "."
         }
     }
