@@ -30,6 +30,17 @@ class MainActivity : AppCompatActivity() {
             displayTextView.text = value
         }
 
+    private val isSignDisplayed: Boolean
+        get() = displayedText in SIGNS
+
+    private val isDisplayedTextMoreThenZero: Boolean
+        get() = if (!isSignDisplayed) {
+            displayedText.toDouble() > 0
+        } else {
+            false
+        }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -55,9 +66,20 @@ class MainActivity : AppCompatActivity() {
 
     private fun handleReversDigitSignClick() {
         displayedText = if (
-            displayedText !in SIGNS && displayedText.toDouble() > 0) {
+            !isSignDisplayed && isDisplayedTextMoreThenZero
+        ) {
             "-$displayedText"
         } else {
+            /*
+            Данный метод вызывал ошибку в программе, если нажать кнопку SIGN с введённым минусом
+            то в первй раз минус удалится, а значит перемнная содержащая знак будет равнятся NULL,
+            а при повторном нажатии программа вылетит так как переменная sign = null, проверка
+            !isSignDisplayed && isDisplayedTextMoreThenZero не проходит и вызывается ветка else,
+            где с помощью removePrefix удаляется не существующий знак минуса.
+            Была добавлена дополнительная проверка на длинну отображаемого текста, если передыдущая
+            проверка не проходит, то вызывается приведённый ниже if и если длина текста = 1, то метод
+            не сработает, иначе знак "-" удалится.
+             */
             if (displayedText.length == 1) {
                 return
             }
@@ -67,18 +89,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleDelClick() {
-        firstNumber = null
-        sign = null
-        displayedText = "0"
+        zeroingValues()
     }
 
     private fun handleEraseClick() {
         displayedText = displayedText.dropLast(1)
         if (displayedText.isEmpty()) {
-            displayedText = "0"
-            sign = null
-            firstNumber = null
+            zeroingValues()
         }
+    }
+
+    private fun zeroingValues() {
+        displayedText = "0"
+        sign = null
+        firstNumber = null
     }
 
     private fun handleDigitClick(digitText: String) {
@@ -100,7 +124,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleDotClick() {
-        if (!displayedText.contains('.') && displayedText !in SIGNS) {
+        if (!displayedText.contains('.') && !isSignDisplayed) {
             displayedText += "."
         }
     }
@@ -122,12 +146,12 @@ class MainActivity : AppCompatActivity() {
             "-" -> firstNumber - secondNumber
             "×" -> firstNumber * secondNumber
             "÷" -> firstNumber / secondNumber
-            else -> 0
+            else -> error("Unknown sign $sign")
         }
 
         this.firstNumber = null
         this.sign = null
-        displayedNumber = result.toDouble()
+        displayedNumber = result
     }
 
     companion object {
