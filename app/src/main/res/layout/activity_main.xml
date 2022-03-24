@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="#62727b"
+    android:orientation="vertical"
 
     tools:context=".MainActivity">
 
@@ -12,8 +12,8 @@
         android:id="@+id/displayTextView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
         android:layout_column="1"
+        android:layout_weight="1"
         android:gravity="right|bottom"
         android:paddingRight="32dp"
         android:paddingBottom="16dp"
@@ -26,8 +26,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="#5B6971"
-        android:padding="16dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -43,20 +43,23 @@
                 android:text="DEL"
                 android:textSize="28sp" />
 
-            <Space
-                android:layout_width="0dp"
+            <Button
+                android:layout_width="120dp"
                 android:layout_height="60dp"
-                android:layout_weight="1"/>
+                android:layout_column="1"
+                android:layout_marginLeft="17dp"
+                android:onClick="onButtonClick"
+                android:text="SIGN"
+                android:textSize="28sp" />
 
             <Button
                 android:layout_width="80dp"
                 android:layout_height="60dp"
                 android:layout_column="1"
-                android:layout_marginLeft="8dp"
+                android:layout_marginLeft="40dp"
                 android:onClick="onButtonClick"
                 android:text="⌫"
                 android:textSize="28sp" />
-
 
 
         </LinearLayout>
@@ -205,11 +208,11 @@
                     android:textSize="32sp" />
 
                 <Button
-                    android:backgroundTint="#1565c0"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
                     android:layout_column="3"
                     android:layout_marginLeft="8dp"
+                    android:backgroundTint="#1565c0"
                     android:onClick="onButtonClick"
                     android:text="="
                     android:textSize="32sp" />

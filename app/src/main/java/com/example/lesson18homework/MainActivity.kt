@@ -6,6 +6,8 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import java.lang.NumberFormatException
+import kotlin.math.roundToInt
 
 class MainActivity : AppCompatActivity() {
     private lateinit var displayTextView: TextView
@@ -43,6 +45,7 @@ class MainActivity : AppCompatActivity() {
 
         when (text) {
             "DEL" -> handleDelClick()
+            "SIGN" -> handleSignClick()
             "⌫" -> handleEraseClick()
             in DIGITS -> handleDigitClick(text)
             in SIGNS -> handleSignClick(text)
@@ -58,15 +61,26 @@ class MainActivity : AppCompatActivity() {
         displayedText = "0"
     }
 
+    fun handleSignClick() {
+        val charSign: Any
+        charSign = try {
+            -(displayedText.toInt())
+        } catch (e: NumberFormatException) {
+            -(displayedText.toDouble())
+        }
+        displayedText = charSign.toString()
+    }
+
     fun handleEraseClick() {
         displayedText = displayedText.dropLast(1)
     }
 
     fun handleDigitClick(digitText: String) {
-        if (displayedText.startsWith("0") || displayedText in SIGNS) {
-            displayedText = digitText
-        } else {
-            displayedText += digitText
+        when {
+            displayedText.contains(".") -> displayedText += digitText
+            displayedText in SIGNS -> displayedText = digitText
+            displayedText.startsWith("0") -> displayedText = digitText
+            else -> displayedText += digitText
         }
     }
 
@@ -78,7 +92,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun handleDotClick() {
-
+        if (displayedText in SIGNS) {
+            displayedText = "0."
+        }
+        if (!displayedText.contains("."))
+            displayedText = "$displayedText."
     }
 
     fun handleEqualsClick() {
@@ -92,12 +110,23 @@ class MainActivity : AppCompatActivity() {
         val firstNumber = this.firstNumber ?: return
         val sign = this.sign ?: return
         val secondNumber = displayedNumber ?: return
+        var result: Double? = null
+        when (sign) {
+            "+" -> result = firstNumber + secondNumber
+            "-" -> result = firstNumber - secondNumber
+            "×" -> result = firstNumber * secondNumber
+            "÷" -> result = firstNumber / secondNumber
+        }
 
-        val result = firstNumber + secondNumber
 
         this.firstNumber = null
         this.sign = null
+        if (result != null) {
+            result = (result * 100).roundToInt() / 100.0
+        }
         displayedNumber = result
+
+        Log.d(TAG, "$firstNumber $sign $secondNumber = $result")
     }
 
     companion object {
@@ -109,7 +138,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         private val SIGNS = listOf(
-            "+", "-", "*", "/"
+            "+", "-", "×", "÷"
         )
     }
 }
