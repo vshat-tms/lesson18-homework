@@ -7,11 +7,16 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
+
+
 class MainActivity : AppCompatActivity() {
     private lateinit var displayTextView: TextView
-
     private var firstNumber: Double? = null
     private var sign: String? = null
+
+    private val isSignDisplayed: Boolean
+        get() = displayedText in SIGNS
+
 
     private var displayedNumber: Double?
         get() = displayTextView.text.toString().toDoubleOrNull()
@@ -36,11 +41,14 @@ class MainActivity : AppCompatActivity() {
         displayTextView = findViewById(R.id.displayTextView)
     }
 
+    private fun noneOperationsStarted(){
+        displayedText = DIGITS[0]
+        sign = null
+        firstNumber = null
+    }
+
     fun onButtonClick(view: View) {
         val text = (view as Button).text.toString()
-
-        Log.d(TAG, "User clicked on button: $text")
-
         when (text) {
             "DEL" -> handleDelClick()
             "⌫" -> handleEraseClick()
@@ -49,67 +57,55 @@ class MainActivity : AppCompatActivity() {
             "." -> handleDotClick()
             "=" -> handleEqualsClick()
             "SIGN" -> handleToReserveDigit()
-
-
         }
     }
 
     private fun handleToReserveDigit() {
+        if (displayedText.isEmpty() || displayedText == DIGITS[0] || isSignDisplayed) return
+
         displayedText =
-            if (displayedText.toDouble() > 0 && displayedText !in SIGNS) {
-                "-$displayedText"
-            } else {
-                if (displayedText.length == 1) {
-                    return
-                }
+            if (displayedText.startsWith("-")){
                 displayedText.removePrefix("-")
+            }else{
+                displayedText.padStart(displayedText.length + 1, '-')
             }
-        Log.d(TAG, "Button SIGN was reversed digit $displayedText")
     }
 
     private fun handleDelClick() {
-        firstNumber = null
-        sign = null
-        displayedText = "0"
-
-        Log.d(TAG, "Button DEL delete all operations")
+        noneOperationsStarted()
     }
 
     private fun handleEraseClick() {
         displayedText = displayedText.dropLast(1)
-        if (displayedText.isEmpty()){
-            displayedText = "0"
-            sign = null
-            firstNumber = null
+        if (displayedText.isEmpty() || displayedText == "-"){ /*displayedText == "-" - на экране не останется один лишь минус  */
+            noneOperationsStarted()
         }
-        Log.d(TAG, "Button <x reoved the las digit of number")
     }
 
     private fun handleDigitClick(digitText: String) {
-        if (displayedText.startsWith("0") || displayedText in SIGNS) {
+        if ((displayedText.startsWith("0") && !displayedText.startsWith("0.")) || isSignDisplayed) {
             displayedText = digitText
-            Log.d(TAG, "User clicked on button $displayedText")
         } else {
             displayedText += digitText
-            Log.d(TAG, "User clicked on button $digitText - new number is $displayedText")
         }
     }
 
-    private fun handleSignClick(signText: String) {
-        if (this.firstNumber != null || this.sign != null) return
-        this.firstNumber = displayedNumber
-        this.sign = signText
-        displayedText = signText
+    /*Добавил функцию смены операции(sign) при уже выбранной операции */
 
-        Log.d(TAG, "User choose operation ($displayedText) ")
+    private fun handleSignClick(signText: String) {
+        if (this.firstNumber == null){
+            this.firstNumber = displayedNumber
+            this.sign = signText
+            displayedText = signText
+        }else if (this.firstNumber != null && isSignDisplayed){
+            this.sign = signText
+            displayedText = signText
+        } else return
     }
 
     private fun handleDotClick() {
-        if(!displayedText.contains(".")){
+        if(!displayedText.contains(".") && !isSignDisplayed){
             displayedText += "."
-            Log.d(TAG, "User add dot to the number")
-        }else{
-            Log.d(TAG,"User try to add second dot")
         }
     }
 
@@ -120,36 +116,32 @@ class MainActivity : AppCompatActivity() {
                     "sign=${sign}, " +
                     "secondNumber=$displayedNumber"
         )
-
         val firstNumber = this.firstNumber ?: return
         val sign = this.sign ?: return
         val secondNumber = displayedNumber ?: return
 
-        var result = when (sign){
+        val result = when (sign){
             "+" -> firstNumber + secondNumber
             "-" -> firstNumber - secondNumber
             "×" -> firstNumber * secondNumber
             "÷" -> firstNumber / secondNumber
-            else -> 0
+            else -> error("Unknown sign $sign")
         }
-
         Log.d(TAG,"Operation = ended with result $result")
-
         this.firstNumber = null
         this.sign = null
-        displayedNumber = result.toDouble()
+        displayedNumber = result
     }
 
     companion object {
         private const val TAG = "MainActivity"
 
-
         private val DIGITS = listOf(
             "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
         )
-
         private val SIGNS = listOf(
             "+", "-", "×", "÷"
         )
+
     }
 }
