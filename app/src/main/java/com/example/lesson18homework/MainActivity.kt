@@ -46,16 +46,26 @@ class MainActivity : AppCompatActivity() {
             "⌫" -> handleEraseClick()
             in DIGITS -> handleDigitClick(text)
             in SIGNS -> handleSignClick(text)
-            "." -> handleDotClick()
+            "." -> handleDotClick(text)
             "=" -> handleEqualsClick()
-
+            "SIGN" -> handleSignChangeClick()
         }
+    }
+
+    fun handleSignChangeClick() {
+        if (displayedText.toInt() == 0 || displayedText.isEmpty() || displayedText in SIGNS) return
+            var value = displayedText.toInt() * (-1)
+            displayedText = value.toString()
+
+        Log.d(TAG, "User clicked on button: ")
     }
 
     fun handleDelClick() {
         firstNumber = null
         sign = null
         displayedText = "0"
+
+        Log.d(TAG, "User clicked on button: ")
     }
 
     fun handleEraseClick() {
@@ -77,8 +87,9 @@ class MainActivity : AppCompatActivity() {
         displayedText = signText
     }
 
-    fun handleDotClick() {
-
+    fun handleDotClick(dotText: String) {
+        if (displayedText.isEmpty() || displayedText in SIGNS || displayedText.contains(".")) return
+        displayedText += dotText
     }
 
     fun handleEqualsClick() {
@@ -93,7 +104,15 @@ class MainActivity : AppCompatActivity() {
         val sign = this.sign ?: return
         val secondNumber = displayedNumber ?: return
 
-        val result = firstNumber + secondNumber
+        var result: Double? = null
+
+        when(sign){
+            "+" -> result = firstNumber + secondNumber
+            "-" -> result = firstNumber - secondNumber
+            "×" -> result = firstNumber * secondNumber
+            "÷" -> result = firstNumber / secondNumber
+        }
+
 
         this.firstNumber = null
         this.sign = null
@@ -109,7 +128,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         private val SIGNS = listOf(
-            "+", "-", "*", "/"
+            "+", "-", "×", "÷"
         )
     }
 }
