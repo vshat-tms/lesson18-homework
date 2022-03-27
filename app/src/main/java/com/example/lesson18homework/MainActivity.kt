@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-     private fun handleDelClick() {
+    private fun handleDelClick() {
         firstNumber = null
         sign = null
         displayedText = "0"
@@ -78,7 +78,7 @@ class MainActivity : AppCompatActivity() {
             errorTheDisplay() -> "0"
             else -> displayedText.dropLast(1)
         }
-        if (displayedText.isBlank()){
+        if (displayedText.isBlank()) {
             displayedText = "0"
         }
     }
@@ -130,7 +130,7 @@ class MainActivity : AppCompatActivity() {
             "+" -> result = firstNumber + secondNumber
             "-" -> result = firstNumber - secondNumber
             "×" -> result = firstNumber * secondNumber
-            "÷" -> result = if (checkSecondNumberForZero(secondNumber)){
+            "÷" -> result = if (checkSecondNumberForZero(secondNumber)) {
                 firstNumber / secondNumber
             } else {
                 0.0
@@ -140,7 +140,7 @@ class MainActivity : AppCompatActivity() {
         this.firstNumber = null
         this.sign = null
         if (result != null) {
-            if (result == 0.0 && sign == "÷"){
+            if (result == 0.0 && sign == "÷") {
                 displayedText = "ERROR"
             } else {
                 displayedNumber = (result * 100).roundToInt() / 100.0
@@ -150,19 +150,19 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "$firstNumber $sign $secondNumber = $result")
     }
 
-    private fun signOnTheDisplay(): Boolean{
+    private fun signOnTheDisplay(): Boolean {
         return displayedText in SIGNS
     }
 
-    private fun containsDot(): Boolean{
+    private fun containsDot(): Boolean {
         return displayedText.contains(".")
     }
 
-    private fun checkSecondNumberForZero(number: Double): Boolean{
+    private fun checkSecondNumberForZero(number: Double): Boolean {
         return number != 0.0
     }
 
-    private fun errorTheDisplay(): Boolean{
+    private fun errorTheDisplay(): Boolean {
         return displayedText == "ERROR"
     }
 
