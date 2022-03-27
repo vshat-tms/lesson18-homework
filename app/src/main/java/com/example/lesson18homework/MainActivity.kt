@@ -53,11 +53,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun handleSignChangeClick() {
-        if (displayedText.toInt() == 0 || displayedText.isEmpty() || displayedText in SIGNS) return
-            var value = displayedText.toInt() * (-1)
-            displayedText = value.toString()
+//        if (displayedText == DIGITS[0] || displayedText.isEmpty() || displayedText in SIGNS) return
+//        var value = 0
+//        if (value == displayedText.toDouble() || value == displayedText.toInt()) {
+//            var result = value * (-1)
+//        }
+        /* выше я пробовал умножение на -1, но не получается разграничить Int и Double,
+        * получается только что-то одно */
 
-        Log.d(TAG, "User clicked on button: ")
+        if (displayedText.isEmpty() || displayedText in SIGNS || displayedText == DIGITS[0]) return
+            displayedText = if (displayedText.startsWith("-")){
+                displayedText.substring(1)
+            } else {
+                displayedText.padStart(displayedText.length + 1, '-')
+            }
+        Log.d(TAG, "Value sign changed, result: $displayedText")
     }
 
     fun handleDelClick() {
@@ -90,6 +100,7 @@ class MainActivity : AppCompatActivity() {
     fun handleDotClick(dotText: String) {
         if (displayedText.isEmpty() || displayedText in SIGNS || displayedText.contains(".")) return
         displayedText += dotText
+
     }
 
     fun handleEqualsClick() {
