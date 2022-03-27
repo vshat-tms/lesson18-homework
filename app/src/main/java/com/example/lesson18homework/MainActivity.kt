@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import java.lang.ArithmeticException
 import java.lang.NumberFormatException
 import kotlin.math.roundToInt
 
@@ -45,7 +46,7 @@ class MainActivity : AppCompatActivity() {
 
         when (text) {
             "DEL" -> handleDelClick()
-            "SIGN" -> handleSignClick()
+            "SIGN" -> handleCharSignClick()
             "⌫" -> handleEraseClick()
             in DIGITS -> handleDigitClick(text)
             in SIGNS -> handleSignClick(text)
@@ -55,51 +56,65 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun handleDelClick() {
+     private fun handleDelClick() {
         firstNumber = null
         sign = null
         displayedText = "0"
     }
 
-    fun handleSignClick() {
-        val charSign: Any
-        charSign = try {
-            -(displayedText.toInt())
-        } catch (e: NumberFormatException) {
-            -(displayedText.toDouble())
+    private fun handleCharSignClick() {
+        displayedText = when {
+            displayedText.startsWith("-") -> displayedText.removePrefix("-")
+            signOnTheDisplay() -> return
+            displayedText == "0" -> return
+            else -> "-$displayedText"
         }
-        displayedText = charSign.toString()
     }
 
-    fun handleEraseClick() {
-        displayedText = displayedText.dropLast(1)
+    private fun handleEraseClick() {
+        displayedText = when {
+            displayedText.startsWith("-") && displayedText.length == 2 -> "0"
+            signOnTheDisplay() || displayedText == "0" -> "0"
+            errorTheDisplay() -> "0"
+            else -> displayedText.dropLast(1)
+        }
+        if (displayedText.isBlank()){
+            displayedText = "0"
+        }
     }
 
-    fun handleDigitClick(digitText: String) {
+    private fun handleDigitClick(digitText: String) {
         when {
-            displayedText.contains(".") -> displayedText += digitText
-            displayedText in SIGNS -> displayedText = digitText
+            containsDot() -> displayedText += digitText
+            signOnTheDisplay() -> displayedText = digitText
             displayedText.startsWith("0") -> displayedText = digitText
+            errorTheDisplay() -> displayedText = digitText
             else -> displayedText += digitText
         }
     }
 
-    fun handleSignClick(signText: String) {
+    private fun handleSignClick(signText: String) {
+        when {
+            signOnTheDisplay() -> displayedText = signText.also {
+                this.sign = signText
+            }
+            errorTheDisplay() -> return
+        }
         if (this.firstNumber != null || this.sign != null) return
         this.firstNumber = displayedNumber
         this.sign = signText
         displayedText = signText
     }
 
-    fun handleDotClick() {
-        if (displayedText in SIGNS) {
+    private fun handleDotClick() {
+        if (signOnTheDisplay() || errorTheDisplay()) {
             displayedText = "0."
         }
-        if (!displayedText.contains("."))
+        if (!containsDot())
             displayedText = "$displayedText."
     }
 
-    fun handleEqualsClick() {
+    private fun handleEqualsClick() {
         Log.d(
             TAG, "clicked equals with " +
                     "firstNumber=${this.firstNumber}, " +
@@ -115,18 +130,40 @@ class MainActivity : AppCompatActivity() {
             "+" -> result = firstNumber + secondNumber
             "-" -> result = firstNumber - secondNumber
             "×" -> result = firstNumber * secondNumber
-            "÷" -> result = firstNumber / secondNumber
+            "÷" -> result = if (checkSecondNumberForZero(secondNumber)){
+                firstNumber / secondNumber
+            } else {
+                0.0
+            }
         }
-
 
         this.firstNumber = null
         this.sign = null
         if (result != null) {
-            result = (result * 100).roundToInt() / 100.0
+            if (result == 0.0 && sign == "÷"){
+                displayedText = "ERROR"
+            } else {
+                displayedNumber = (result * 100).roundToInt() / 100.0
+            }
         }
-        displayedNumber = result
 
         Log.d(TAG, "$firstNumber $sign $secondNumber = $result")
+    }
+
+    private fun signOnTheDisplay(): Boolean{
+        return displayedText in SIGNS
+    }
+
+    private fun containsDot(): Boolean{
+        return displayedText.contains(".")
+    }
+
+    private fun checkSecondNumberForZero(number: Double): Boolean{
+        return number != 0.0
+    }
+
+    private fun errorTheDisplay(): Boolean{
+        return displayedText == "ERROR"
     }
 
     companion object {
