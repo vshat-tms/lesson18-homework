@@ -13,6 +13,9 @@ class MainActivity : AppCompatActivity() {
     private var firstNumber: Double? = null
     private var sign: String? = null
 
+    private val isSignDisplayed: Boolean
+        get() = displayedText in SIGNS
+
     private var displayedNumber: Double?
         get() = displayTextView.text.toString().toDoubleOrNull()
         set(value) {
@@ -46,38 +49,38 @@ class MainActivity : AppCompatActivity() {
             "⌫" -> handleEraseClick()
             in DIGITS -> handleDigitClick(text)
             in SIGNS -> handleSignClick(text)
-            "." -> handleDotClick(text)
+            SIGN_DOT -> handleDotClick()
             "=" -> handleEqualsClick()
             "SIGN" -> handleChangeSignClick()
         }
     }
 
     private fun handleChangeSignClick() {
-        if (displayedText.isEmpty() || displayedText == DIGITS[0]) return
+        if (displayedText.isEmpty() || displayedText == ZERO_NUMBER) return
 
-        displayedText = if (displayedText.startsWith("-")) {
+        displayedText = if (displayedText.startsWith(SIGN_MINUS)) {
             displayedText.substring(1)
         } else {
-            displayedText.padStart(displayedText.length + 1, '-')
+            displayedText.padStart(displayedText.length + 1, SIGN_MINUS_CHAR)
         }
     }
 
     private fun handleDelClick() {
         firstNumber = null
         sign = null
-        displayedText = DIGITS[0]
+        displayedText = ZERO_NUMBER
     }
 
     private fun handleEraseClick() {
         displayedText = displayedText.dropLast(1)
-        if (displayedText == SIGNS[1] || displayedText.isEmpty()) {
-            displayedText = DIGITS[0]
+        if (displayedText == SIGN_MINUS || displayedText.isEmpty()) {
+            displayedText = ZERO_NUMBER
         }
     }
 
     private fun handleDigitClick(digitText: String) {
 
-        if (displayedText == DIGITS[0] || displayedText in SIGNS || displayedText.isEmpty()) {
+        if (displayedText == ZERO_NUMBER || isSignDisplayed || displayedText.isEmpty()) {
             displayedText = digitText
         } else {
             displayedText += digitText
@@ -92,11 +95,11 @@ class MainActivity : AppCompatActivity() {
         displayedText = signText
     }
 
-    private fun handleDotClick(digitText: String) {
-        if (displayedText in SIGNS || displayedText.isEmpty() || displayedText.contains(".")) {
+    private fun handleDotClick() {
+        if (isSignDisplayed || displayedText.isEmpty() || displayedText.contains(SIGN_DOT)) {
             return
         } else {
-            displayedText += digitText
+            displayedText += SIGN_DOT
         }
     }
 
@@ -113,11 +116,11 @@ class MainActivity : AppCompatActivity() {
         val secondNumber = displayedNumber ?: return
 
         displayedNumber = when (sign) {
-            "+" -> firstNumber + secondNumber
-            "-" -> firstNumber - secondNumber
-            "÷" -> firstNumber / secondNumber
-            "×" -> firstNumber * secondNumber
-            else -> null
+            SIGN_PLUS -> firstNumber + secondNumber
+            SIGN_MINUS -> firstNumber - secondNumber
+            SIGN_DIVISION -> firstNumber / secondNumber
+            SIGN_MULTIPLY -> firstNumber * secondNumber
+            else -> error("Unknown sign - $sign")
         }
 
         this.firstNumber = null
@@ -126,11 +129,18 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "MainActivity"
+        private const val SIGN_MULTIPLY = "×"
+        private const val SIGN_DIVISION = "÷"
+        private const val SIGN_PLUS = "+"
+        private const val SIGN_MINUS = "-"
+        private const val SIGN_DOT = "."
+        private const val ZERO_NUMBER = "0"
+        private const val SIGN_MINUS_CHAR = '-'
         private val DIGITS = listOf(
             "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
         )
         private val SIGNS = listOf(
-            "+", "-", "×", "÷"
+            SIGN_PLUS, SIGN_MINUS, SIGN_MULTIPLY, SIGN_DIVISION
         )
     }
 }
