@@ -6,14 +6,13 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import java.lang.StringBuilder
+
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var displayTextView: TextView
 
+    private lateinit var displayTextView: TextView
     private var firstNumber: Double? = null
     private var sign: String? = null
-
     private var displayedNumber: Double?
         get() = displayTextView.text.toString().toDoubleOrNull()
         set(value) {
@@ -55,16 +54,17 @@ class MainActivity : AppCompatActivity() {
         sign = null
         displayedText = "0"
     }
+
     fun handleChangeSignClick() {
-        val minusSign = "-"
-        var positiveOrNegativeNumber: String = displayTextView.text.toString()
-        if(positiveOrNegativeNumber.contains(minusSign)){
-            var number : Int = positiveOrNegativeNumber.toInt()
-            var result : Int = number*(-1)
-            positiveOrNegativeNumber= result.toString()
+        if (displayedText.isEmpty()) return
+        var positiveOrNegativeNumber = displayTextView.text.toString()
+        if (positiveOrNegativeNumber.contains(MINUSSIGN)) {
+            val number = positiveOrNegativeNumber.toInt()
+            val result = number * (-1)
+            positiveOrNegativeNumber = result.toString()
             displayTextView.text = positiveOrNegativeNumber
-        }else if (!(positiveOrNegativeNumber.contains(minusSign))){
-            positiveOrNegativeNumber = minusSign + positiveOrNegativeNumber
+        } else if (!(positiveOrNegativeNumber.contains(MINUSSIGN))) {
+            positiveOrNegativeNumber = MINUSSIGN + positiveOrNegativeNumber
             displayTextView.text = positiveOrNegativeNumber
         }
     }
@@ -93,12 +93,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun handleDotClick() {
-        val dot = "."
-        var dotNumber: String = displayTextView.text.toString()
-        if(dotNumber.contains(dot)){
+        var dotNumber = displayTextView.text.toString()
+        if (dotNumber.contains(DOT)) {
             displayTextView.text = dotNumber
-        }else{
-            dotNumber += dot
+        } else {
+            dotNumber += DOT
             displayTextView.text = dotNumber
         }
     }
@@ -114,7 +113,7 @@ class MainActivity : AppCompatActivity() {
         val sign = this.sign ?: return
         val secondNumber = displayedNumber ?: return
         var result: Double? = null
-        when(sign){
+        when (sign) {
             "+" -> result = firstNumber + secondNumber
             "-" -> result = firstNumber - secondNumber
             "÷" -> result = firstNumber / secondNumber
@@ -124,7 +123,10 @@ class MainActivity : AppCompatActivity() {
         this.sign = null
         displayedNumber = result
     }
+
     companion object {
+        private val DOT = "."
+        private val MINUSSIGN = "-"
         private const val TAG = "MainActivity"
         private val DIGITS = listOf(
             "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
