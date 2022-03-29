@@ -91,7 +91,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     /*Добавил функцию смены операции(sign) при уже выбранной операции */
-
     private fun handleSignClick(signText: String) {
         if (this.firstNumber == null){
             this.firstNumber = displayedNumber
