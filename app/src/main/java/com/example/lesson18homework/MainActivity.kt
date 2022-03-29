@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         displayTextView = findViewById(R.id.displayTextView)
     }
 
-    fun onButtonClick(view: View) {
+    private fun onButtonClick(view: View) {
         val text = (view as Button).text.toString()
 
         Log.d(TAG, "User clicked on button: $text")
@@ -52,25 +52,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun handleSignChangeClick() {
-//        if (displayedText == DIGITS[0] || displayedText.isEmpty() || displayedText in SIGNS) return
-//        var value = 0
-//        if (value == displayedText.toDouble() || value == displayedText.toInt()) {
-//            var result = value * (-1)
-//        }
-        /* выше я пробовал умножение на -1, но не получается разграничить Int и Double,
-        * получается только что-то одно */
-
+    private fun handleSignChangeClick() {
         if (displayedText.isEmpty() || displayedText in SIGNS || displayedText == DIGITS[0]) return
-            displayedText = if (displayedText.startsWith("-")){
-                displayedText.substring(1)
-            } else {
-                displayedText.padStart(displayedText.length + 1, '-')
-            }
+        displayedText = if (displayedText.startsWith("-")) {
+            displayedText.substring(1)
+        } else {
+            displayedText.padStart(displayedText.length + 1, '-')
+        }
         Log.d(TAG, "Value sign changed, result: $displayedText")
     }
 
-    fun handleDelClick() {
+    private fun handleDelClick() {
         firstNumber = null
         sign = null
         displayedText = "0"
@@ -78,11 +70,11 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "User clicked on button: ")
     }
 
-    fun handleEraseClick() {
+    private fun handleEraseClick() {
         displayedText = displayedText.dropLast(1)
     }
 
-    fun handleDigitClick(digitText: String) {
+    private fun handleDigitClick(digitText: String) {
         if (displayedText.startsWith("0") && !displayedText.startsWith("0.") || displayedText in SIGNS) {
             displayedText = digitText
         } else {
@@ -90,20 +82,20 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun handleSignClick(signText: String) {
+    private fun handleSignClick(signText: String) {
         if (this.firstNumber != null || this.sign != null) return
         this.firstNumber = displayedNumber
         this.sign = signText
         displayedText = signText
     }
 
-    fun handleDotClick(dotText: String) {
+    private fun handleDotClick(dotText: String) {
         if (displayedText.isEmpty() || displayedText in SIGNS || displayedText.contains(".")) return
         displayedText += dotText
 
     }
 
-    fun handleEqualsClick() {
+    private fun handleEqualsClick() {
         Log.d(
             TAG, "clicked equals with " +
                     "firstNumber=${this.firstNumber}, " +
@@ -117,7 +109,7 @@ class MainActivity : AppCompatActivity() {
 
         var result: Double? = null
 
-        when(sign){
+        when (sign) {
             "+" -> result = firstNumber + secondNumber
             "-" -> result = firstNumber - secondNumber
             "×" -> result = firstNumber * secondNumber
