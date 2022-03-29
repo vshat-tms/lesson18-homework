@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import kotlin.math.roundToInt
 
 class MainActivity : AppCompatActivity() {
     private lateinit var displayTextView: TextView
@@ -48,40 +49,66 @@ class MainActivity : AppCompatActivity() {
             in SIGNS -> handleSignClick(text)
             "." -> handleDotClick()
             "=" -> handleEqualsClick()
-
+            "SIGN" -> handleReversSignClick()
         }
     }
 
-    fun handleDelClick() {
+    //Замена знака на противоположный
+    private fun handleReversSignClick() {
+        displayedText = when {
+            displayedText.startsWith("-") -> displayedText.removePrefix("-")
+            signOnTheDisplay() -> return
+            displayedText == "0" -> return
+
+            else -> "-$displayedText"
+        }
+    }
+
+    //Очистка поля вывода
+    private fun handleDelClick() {
         firstNumber = null
         sign = null
         displayedText = "0"
     }
 
-    fun handleEraseClick() {
+    //Удаление последнего симлова
+    private fun handleEraseClick() {
         displayedText = displayedText.dropLast(1)
     }
 
-    fun handleDigitClick(digitText: String) {
-        if (displayedText.startsWith("0") || displayedText in SIGNS) {
-            displayedText = digitText
-        } else {
-            displayedText += digitText
+    /* Проверка на ввод числа, если 0 -пишем введёное число, если не 0. дописываем введёное число
+    ИЛИ на экране знак, то меняем на введёное число*/
+    private fun handleDigitClick(digitText: String) {
+        when {
+            signOnTheDisplay() -> displayedText = digitText
+            containsThePoint() -> displayedText += digitText
+            displayedText.startsWith("0") -> displayedText = digitText
+            displayError() -> displayedText = digitText
+            else -> displayedText += digitText
+
         }
     }
 
-    fun handleSignClick(signText: String) {
+    //Метод проверки введённого знака
+    private fun handleSignClick(signText: String) {
         if (this.firstNumber != null || this.sign != null) return
         this.firstNumber = displayedNumber
         this.sign = signText
         displayedText = signText
     }
 
-    fun handleDotClick() {
+    //Метод ввода точки
+    private fun handleDotClick() {
+        if (signOnTheDisplay() || displayError()) {
+            displayedText = "."
+        }
+        if (!containsThePoint()) {
+            displayedText = "$displayedText."
+        }
 
     }
 
-    fun handleEqualsClick() {
+    private fun handleEqualsClick() {
         Log.d(
             TAG, "clicked equals with " +
                     "firstNumber=${this.firstNumber}, " +
@@ -93,11 +120,40 @@ class MainActivity : AppCompatActivity() {
         val sign = this.sign ?: return
         val secondNumber = displayedNumber ?: return
 
-        val result = firstNumber + secondNumber
+        var result: Double? = null
+        when (sign) {
+            "+" -> result = firstNumber + secondNumber
+            "-" -> result = firstNumber - secondNumber
+            "×" -> result = firstNumber * secondNumber
+            "÷" -> result = if (secondNumber != 0.0) {
+                firstNumber / secondNumber
+            } else 0.0
+        }
 
         this.firstNumber = null
         this.sign = null
-        displayedNumber = result
+
+        if (result != null) {
+            if (result == 0.0 && sign == "÷") {
+                displayedText = "Error"
+            } else {
+                displayedNumber = (result * 100).roundToInt() / 100.0
+            }
+        }
+    }
+
+    //Метод проверки на вывод знака
+    private fun signOnTheDisplay(): Boolean {
+        return displayedText in SIGNS
+    }
+
+    //Метод проверки на вывод точки
+    private fun containsThePoint(): Boolean {
+        return displayedText.contains(".")
+    }
+
+    private fun displayError(): Boolean {
+        return displayedText == "Error"
     }
 
     companion object {
@@ -109,7 +165,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         private val SIGNS = listOf(
-            "+", "-", "*", "/"
+            "+", "-", "×", "÷"
         )
     }
 }
